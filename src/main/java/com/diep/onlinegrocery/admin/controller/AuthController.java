@@ -8,11 +8,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.security.core.Authentication;
 import com.diep.onlinegrocery.admin.dto.UserDto;
 import com.diep.onlinegrocery.admin.entity.User;
 import com.diep.onlinegrocery.admin.service.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Controller
@@ -25,15 +27,25 @@ public class AuthController {
 	}
 
 	// handler method to handle home page request
-	@GetMapping({"/", "/index"})
+	@GetMapping({ "/", "/index" })
 	public String home() {
 		return "admin/index";
+	}
+	
+	@GetMapping({ "/page404" })
+	public String page404() {
+		return "admin/404";
 	}
 
 	// handler method to handle login request
 	@GetMapping("/login")
-	public String login() {
-		return "admin/login";
+	public String login(HttpServletRequest request) {
+		Authentication authentication = (Authentication) request.getUserPrincipal();
+		if (authentication != null && authentication.isAuthenticated()) {
+			return "redirect:/users";
+		} else {
+			return "admin/login";
+		}
 	}
 
 	// handler method to handle user registration form request
